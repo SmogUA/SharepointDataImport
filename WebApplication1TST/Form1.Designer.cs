@@ -71,6 +71,8 @@ namespace WebApplication1TST
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.ValidateData = new System.Windows.Forms.Button();
             this.DateExample = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -146,6 +148,7 @@ namespace WebApplication1TST
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.Size = new System.Drawing.Size(515, 267);
             this.dataGridView1.TabIndex = 6;
+            this.dataGridView1.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellValueChanged);
             // 
             // ExFieldTitle
             // 
@@ -188,6 +191,7 @@ namespace WebApplication1TST
             // 
             // StartImport
             // 
+            this.StartImport.Enabled = false;
             this.StartImport.Location = new System.Drawing.Point(557, 246);
             this.StartImport.Name = "StartImport";
             this.StartImport.Size = new System.Drawing.Size(75, 23);
@@ -208,7 +212,7 @@ namespace WebApplication1TST
             // StartTime
             // 
             this.StartTime.AutoSize = true;
-            this.StartTime.Location = new System.Drawing.Point(645, 298);
+            this.StartTime.Location = new System.Drawing.Point(677, 298);
             this.StartTime.Name = "StartTime";
             this.StartTime.Size = new System.Drawing.Size(49, 13);
             this.StartTime.TabIndex = 12;
@@ -226,7 +230,7 @@ namespace WebApplication1TST
             // EndTime
             // 
             this.EndTime.AutoSize = true;
-            this.EndTime.Location = new System.Drawing.Point(645, 324);
+            this.EndTime.Location = new System.Drawing.Point(677, 324);
             this.EndTime.Name = "EndTime";
             this.EndTime.Size = new System.Drawing.Size(49, 13);
             this.EndTime.TabIndex = 14;
@@ -237,15 +241,15 @@ namespace WebApplication1TST
             this.label8.AutoSize = true;
             this.label8.Location = new System.Drawing.Point(551, 350);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(81, 13);
+            this.label8.Size = new System.Drawing.Size(85, 13);
             this.label8.TabIndex = 15;
-            this.label8.Text = "Records Added";
+            this.label8.Text = "Items Processed";
             // 
             // ProcessedItems
             // 
             this.ProcessedItems.AccessibleRole = System.Windows.Forms.AccessibleRole.WhiteSpace;
             this.ProcessedItems.AutoSize = true;
-            this.ProcessedItems.Location = new System.Drawing.Point(665, 346);
+            this.ProcessedItems.Location = new System.Drawing.Point(697, 346);
             this.ProcessedItems.Name = "ProcessedItems";
             this.ProcessedItems.Size = new System.Drawing.Size(13, 13);
             this.ProcessedItems.TabIndex = 16;
@@ -270,18 +274,20 @@ namespace WebApplication1TST
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.label10);
+            this.panel1.Controls.Add(this.label9);
             this.panel1.Controls.Add(this.RemoveKey);
             this.panel1.Controls.Add(this.AddKey);
             this.panel1.Controls.Add(this.ActiveKeys);
             this.panel1.Controls.Add(this.PossibleKeys);
-            this.panel1.Location = new System.Drawing.Point(402, 22);
+            this.panel1.Location = new System.Drawing.Point(402, 12);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(386, 159);
+            this.panel1.Size = new System.Drawing.Size(386, 169);
             this.panel1.TabIndex = 19;
             // 
             // RemoveKey
             // 
-            this.RemoveKey.Location = new System.Drawing.Point(155, 71);
+            this.RemoveKey.Location = new System.Drawing.Point(155, 84);
             this.RemoveKey.Name = "RemoveKey";
             this.RemoveKey.Size = new System.Drawing.Size(75, 23);
             this.RemoveKey.TabIndex = 3;
@@ -291,7 +297,7 @@ namespace WebApplication1TST
             // 
             // AddKey
             // 
-            this.AddKey.Location = new System.Drawing.Point(155, 33);
+            this.AddKey.Location = new System.Drawing.Point(155, 46);
             this.AddKey.Name = "AddKey";
             this.AddKey.Size = new System.Drawing.Size(75, 23);
             this.AddKey.TabIndex = 2;
@@ -302,7 +308,7 @@ namespace WebApplication1TST
             // ActiveKeys
             // 
             this.ActiveKeys.FormattingEnabled = true;
-            this.ActiveKeys.Location = new System.Drawing.Point(246, 10);
+            this.ActiveKeys.Location = new System.Drawing.Point(246, 23);
             this.ActiveKeys.Name = "ActiveKeys";
             this.ActiveKeys.Size = new System.Drawing.Size(120, 134);
             this.ActiveKeys.TabIndex = 1;
@@ -310,7 +316,7 @@ namespace WebApplication1TST
             // PossibleKeys
             // 
             this.PossibleKeys.FormattingEnabled = true;
-            this.PossibleKeys.Location = new System.Drawing.Point(14, 10);
+            this.PossibleKeys.Location = new System.Drawing.Point(14, 23);
             this.PossibleKeys.Name = "PossibleKeys";
             this.PossibleKeys.Size = new System.Drawing.Size(120, 134);
             this.PossibleKeys.TabIndex = 0;
@@ -325,6 +331,7 @@ namespace WebApplication1TST
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
+            this.checkBox1.Enabled = false;
             this.checkBox1.Location = new System.Drawing.Point(554, 404);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(163, 17);
@@ -334,6 +341,7 @@ namespace WebApplication1TST
             // 
             // ValidateData
             // 
+            this.ValidateData.Enabled = false;
             this.ValidateData.Location = new System.Drawing.Point(668, 246);
             this.ValidateData.Name = "ValidateData";
             this.ValidateData.Size = new System.Drawing.Size(75, 23);
@@ -348,6 +356,24 @@ namespace WebApplication1TST
             this.DateExample.Size = new System.Drawing.Size(121, 13);
             this.DateExample.TabIndex = 23;
             this.DateExample.Text = "02/14/2019";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(14, 4);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(72, 13);
+            this.label9.TabIndex = 4;
+            this.label9.Text = "Possible Keys";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(243, 4);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(63, 13);
+            this.label10.TabIndex = 5;
+            this.label10.Text = "Active Keys";
             // 
             // Form1
             // 
@@ -384,6 +410,7 @@ namespace WebApplication1TST
             this.Text = "Sharepoint Data Import Tool";
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -424,5 +451,7 @@ namespace WebApplication1TST
         private CheckBox checkBox1;
         private Button ValidateData;
         private Label DateExample;
+        private Label label10;
+        private Label label9;
     }
 }

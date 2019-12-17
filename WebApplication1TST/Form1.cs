@@ -167,5 +167,35 @@ namespace WebApplication1TST
             };
 
         }
+
+        private void dataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+
+            var mapping = new List<DIMapping>();
+            foreach (DataGridViewRow row in dataGridView1.Rows)
+            {
+                var combocell = (DataGridViewComboBoxCell)row.Cells[1];
+                if (combocell.Value != null)
+                {
+                    string internalFieldName = combocell.Value.ToString();
+                    var txtCell = (DataGridViewTextBoxCell)row.Cells[0];
+                    var fileFieldName = txtCell.Value;
+                    if (!string.IsNullOrEmpty(internalFieldName))
+                        mapping.Add(new DIMapping() { Name = internalFieldName, Value = fileFieldName.ToString() });
+
+                };
+            }
+            if (mapping.Count > 0)
+            {
+                this.StartImport.Enabled = true;
+
+            }
+            else
+            {
+                this.StartImport.Enabled = false;
+            };
+                
+            
+        }
     }
 }

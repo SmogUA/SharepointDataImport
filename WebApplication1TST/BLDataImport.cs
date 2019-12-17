@@ -50,6 +50,7 @@ namespace DataImport
 
         private void FillNonStandardFieldsRelations(List<DIMapping> mapping, SPWeb web, SPList lst)
         {
+            Relations.Clear();
             var nonStandardFields = mapping.Where(m => standardFieldsCollection.All(sfc => (sfc ?? "") != (m.Name ?? ""))).ToList();
             if (nonStandardFields.Count > 0)
             {
@@ -353,7 +354,7 @@ namespace DataImport
                 string FieldName = KeyValue.Key;
                 int RowId = KeyValue.Value;
 
-                string SearchValue = rowCell[RowId].ToString().Trim();
+                string SearchValue = rowCell[RowId].ToString().Trim().ToLower();
                 Hashtable table = HashDictionary[FieldName];
                 List<int> tmp = null;
                 if (firstlap == true)
@@ -366,7 +367,7 @@ namespace DataImport
 
                 }
                 else
-                {//not forst lap
+                {//not first lap
                     if (table.ContainsKey(SearchValue))
                     {
                         tmp = (List<int>)table[SearchValue];

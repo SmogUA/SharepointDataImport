@@ -31,8 +31,7 @@ namespace WebApplication1TST
             //CreatefingLookup fields HashTables
 
                 foreach (DIMapping mp in mapping)
-                {
-                    
+                {                    
                    
                 SPField field = list.Fields.GetField(mp.Name);
                 SPFieldType fieldType = field.Type;
@@ -93,19 +92,19 @@ namespace WebApplication1TST
                             {
                                 Val = listItem[mp.Name].ToString();
                                 SPFieldLookupValue value = new SPFieldLookupValue(Val);
-                                Val = value.LookupValue;
+                                Val = value.LookupValue.ToLower();
                             }
                             break;
                         case SPFieldType.Text:
                             if (listItem[mp.Name] != null)
                             {
-                                Val = listItem[mp.Name].ToString();
+                                Val = listItem[mp.Name].ToString().ToLower();
                             }
                             break;
                         case SPFieldType.DateTime:
                             if(listItem[mp.Name] != null)
                             { 
-                            string TMPdate = listItem[mp.Name].ToString();
+                            string TMPdate = listItem[mp.Name].ToString().ToLower();
                             DateTime dt= DateTime.Parse(TMPdate);                            
                             Val = dt.ToString(TimeFormat);
                             }
@@ -113,25 +112,25 @@ namespace WebApplication1TST
                         case SPFieldType.Boolean:
                             if (listItem[mp.Name] != null)
                             {
-                                Val = listItem[mp.Name].ToString();
+                                Val = listItem[mp.Name].ToString().ToLower();
                             }
                             break;
                         case SPFieldType.Calculated:
                             if (listItem[mp.Name] != null)
                             {
-                                Val = listItem[mp.Name].ToString();
+                                Val = listItem[mp.Name].ToString().ToLower();
                             }
                             break;
                         case SPFieldType.Choice:
                             if (listItem[mp.Name] != null)
                             {
-                                Val = listItem[mp.Name].ToString();
+                                Val = listItem[mp.Name].ToString().ToLower();
                             }
                             break;
                         default:
                             if (listItem[mp.Name] != null)
                             {
-                                Val = listItem[mp.Name].ToString();
+                                Val = listItem[mp.Name].ToString().ToLower();
                             }
                             break;
 
@@ -166,7 +165,7 @@ namespace WebApplication1TST
             var result = new Hashtable();
             foreach (SPListItem listItem in list.Items)
             {
-                string Val = listItem["Title"].ToString();
+                string Val = listItem["Title"].ToString().ToLower();
 
                 if (result.ContainsKey(Val))
                 {
