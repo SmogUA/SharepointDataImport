@@ -89,34 +89,50 @@ namespace WebApplication1TST
                     switch (FieldType)
                     {
                         case SPFieldType.Lookup:
-
-                            Val = listItem.GetFormattedValue(mp.Name);
-                            SPFieldLookupValue value = new SPFieldLookupValue(Val);
-                            Val = value.LookupValue;                           
+                            if (listItem[mp.Name] != null)
+                            {
+                                Val = listItem[mp.Name].ToString();
+                                SPFieldLookupValue value = new SPFieldLookupValue(Val);
+                                Val = value.LookupValue;
+                            }
                             break;
                         case SPFieldType.Text:
-                            Val = listItem.GetFormattedValue(mp.Name);
+                            if (listItem[mp.Name] != null)
+                            {
+                                Val = listItem[mp.Name].ToString();
+                            }
                             break;
                         case SPFieldType.DateTime:
                             if(listItem[mp.Name] != null)
                             { 
                             string TMPdate = listItem[mp.Name].ToString();
-                            DateTime dt= DateTime.Parse(TMPdate);
-                            //DateTime.TryParseExact(TMPdate, TimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt);
+                            DateTime dt= DateTime.Parse(TMPdate);                            
                             Val = dt.ToString(TimeFormat);
                             }
                              break;
                         case SPFieldType.Boolean:
-                            Val = listItem.GetFormattedValue(mp.Name);
+                            if (listItem[mp.Name] != null)
+                            {
+                                Val = listItem[mp.Name].ToString();
+                            }
                             break;
                         case SPFieldType.Calculated:
-                            Val = listItem.GetFormattedValue(mp.Name);
+                            if (listItem[mp.Name] != null)
+                            {
+                                Val = listItem[mp.Name].ToString();
+                            }
                             break;
                         case SPFieldType.Choice:
-                            Val = listItem.GetFormattedValue(mp.Name);
+                            if (listItem[mp.Name] != null)
+                            {
+                                Val = listItem[mp.Name].ToString();
+                            }
                             break;
                         default:
-                            Val = listItem.GetFormattedValue(mp.Name);
+                            if (listItem[mp.Name] != null)
+                            {
+                                Val = listItem[mp.Name].ToString();
+                            }
                             break;
 
                     }
