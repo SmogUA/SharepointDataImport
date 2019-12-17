@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{4E892F9B-D347-4D37-9306-80745EBDDC6A}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>WebApplication1TST</RootNamespace>
-    <AssemblyName>WebApplication1TST</AssemblyName>
+    <RootNamespace>SharepointImport</RootNamespace>
+    <AssemblyName>SharepointImport</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
@@ -87,6 +87,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

@@ -94,11 +94,11 @@ namespace WebApplication1TST
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(196, 32);
+            this.label1.Location = new System.Drawing.Point(130, 27);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(49, 13);
+            this.label1.Size = new System.Drawing.Size(120, 13);
             this.label1.TabIndex = 1;
-            this.label1.Text = "Filename";
+            this.label1.Text = "Please Select Import file";
             // 
             // label2
             // 
@@ -146,7 +146,7 @@ namespace WebApplication1TST
             this.dataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
             this.dataGridView1.Location = new System.Drawing.Point(12, 234);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(515, 267);
+            this.dataGridView1.Size = new System.Drawing.Size(515, 296);
             this.dataGridView1.TabIndex = 6;
             this.dataGridView1.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellValueChanged);
             // 
@@ -257,9 +257,9 @@ namespace WebApplication1TST
             // 
             // richTextBox1
             // 
-            this.richTextBox1.Location = new System.Drawing.Point(12, 507);
+            this.richTextBox1.Location = new System.Drawing.Point(12, 536);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(515, 157);
+            this.richTextBox1.Size = new System.Drawing.Size(776, 128);
             this.richTextBox1.TabIndex = 17;
             this.richTextBox1.Text = "";
             // 

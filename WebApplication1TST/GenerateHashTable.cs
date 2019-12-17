@@ -59,8 +59,9 @@ namespace WebApplication1TST
                         // Get the name of the list where this field gets information.
                         LookupList = Web.Lists[new Guid(lookupField.LookupList)];
                         SPField targetField = LookupList.Fields.GetFieldByInternalName(lookupField.LookupField);
+                        string TargetInternalName = targetField.InternalName;
                         string Lookuplistname = LookupList.Title + "LIST";
-                        Hashtable HT = GetLookupHash(LookupList);
+                        Hashtable HT = GetLookupHash(LookupList, TargetInternalName);
                         HashDictionary.Add(Lookuplistname, HT);
 
                         LookupRelations.Add(mp.Value, LookupList);
@@ -160,12 +161,12 @@ namespace WebApplication1TST
             return HashDictionary;
         }
 
-        private static Hashtable GetLookupHash(SPList list)
+        private static Hashtable GetLookupHash(SPList list, string TargetInternalName)
         {
             var result = new Hashtable();
             foreach (SPListItem listItem in list.Items)
             {
-                string Val = listItem["Title"].ToString().ToLower();
+                string Val = listItem[TargetInternalName].ToString().ToLower();
 
                 if (result.ContainsKey(Val))
                 {

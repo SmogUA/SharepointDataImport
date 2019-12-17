@@ -90,18 +90,21 @@ namespace WebApplication1TST
 
         private void StartImport_Click(object sender, EventArgs e)
         {
-            
+            richTextBox1.Clear();
             Cursor = Cursors.WaitCursor;
                        
             var mapping = new List<DIMapping>();
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
                 var combocell = (DataGridViewComboBoxCell)row.Cells[1];
+                if (combocell.Value != null)
+                {              
                 string internalFieldName = combocell.Value.ToString();
                 var txtCell = (DataGridViewTextBoxCell)row.Cells[0];
                 var fileFieldName = txtCell.Value;
                 if (!string.IsNullOrEmpty(internalFieldName))
                     mapping.Add(new DIMapping() { Name = internalFieldName, Value = fileFieldName.ToString() });
+                }
             }
             if (mapping.Count == 0)
                 return;
@@ -115,19 +118,23 @@ namespace WebApplication1TST
 
             if (ActiveKeys.Items.Count > 0)
             {
-             SelectedKeys = ActiveKeys.Items.Cast<String>().ToList();
-             HashDictionary = GenerateHashTable.HashTableForListField(list, SelectedKeys, mapping, web, TimeFormat, ref LookupRelations);
-            
-               for (var i = 0; i < SelectedKeys.Count; i++)
+                SelectedKeys = ActiveKeys.Items.Cast<String>().ToList();
+                HashDictionary = GenerateHashTable.HashTableForListField(list, SelectedKeys, mapping, web, TimeFormat, ref LookupRelations);
+
+                for (var i = 0; i < SelectedKeys.Count; i++)
                 {
-                   int index=headers.IndexOf(SelectedKeys[i]);
-                    if (index != -1) {
+                    int index = headers.IndexOf(SelectedKeys[i]);
+                    if (index != -1)
+                    {
                         SelectedKeysRows.Add(SelectedKeys[i], index);
                     }
 
                 }
 
 
+            }
+            else {
+                HashDictionary = GenerateHashTable.HashTableForListField(list, SelectedKeys, mapping, web, TimeFormat, ref LookupRelations);
             }
              //Hash is ready
 
