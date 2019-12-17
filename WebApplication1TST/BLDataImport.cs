@@ -134,7 +134,7 @@ namespace DataImport
             {
 
                 SPFieldLookupValue val = null;
-                List<int> ItemID = (List<int>)table[rowCell];
+                List<int> ItemID = (List<int>)table[rowCell.ToLower().Trim()];
                 if (ItemID != null)
                 {
                     SPListItem Item = list.GetItemById(ItemID.FirstOrDefault());
