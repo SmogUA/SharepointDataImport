@@ -168,18 +168,22 @@ namespace WebApplication1TST
             {
                 string Val = listItem[TargetInternalName].ToString().ToLower();
 
-                if (result.ContainsKey(Val))
+                if (!String.IsNullOrEmpty(Val))
                 {
-                    List<int> tmp = (List<int>)result[Val];
-                    tmp.Add(listItem.ID);
 
+                    if (result.ContainsKey(Val))
+                    {
+                        List<int> tmp = (List<int>)result[Val];
+                        tmp.Add(listItem.ID);
+
+                    }
+                    else
+                    {
+                        List<int> ItemID = new List<int>();
+                        ItemID.Add(listItem.ID);
+                        result.Add(Val, ItemID);
+                    };
                 }
-                else
-                {
-                    List<int> ItemID = new List<int>();
-                    ItemID.Add(listItem.ID);
-                    result.Add(Val, ItemID);
-                };
 
             }
 

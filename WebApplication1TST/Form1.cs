@@ -90,6 +90,11 @@ namespace WebApplication1TST
 
         private void StartImport_Click(object sender, EventArgs e)
         {
+            AddKey.Enabled = false;
+            RemoveKey.Enabled = false;
+            StartImport.Enabled = false;
+            ValidateData.Enabled = false;
+
             richTextBox1.Clear();
             Cursor = Cursors.WaitCursor;
                        
@@ -153,7 +158,11 @@ namespace WebApplication1TST
                 ProcessedItems.Text = DataImport.GetNumberOfItems().ToString();
                 //TimeTaken.Text = Conversions.ToString(diff);
             }
+
             Cursor = Cursors.Arrow;
+            AddKey.Enabled = true;
+            RemoveKey.Enabled = true;
+            StartImport.Enabled = true;
         }
 
         private void AddKey_Click(object sender, EventArgs e)
