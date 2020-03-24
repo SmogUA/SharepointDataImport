@@ -168,8 +168,10 @@ namespace WebApplication1TST
             {
                 string Val = listItem[TargetInternalName].ToString().ToLower();
 
-                if (!String.IsNullOrEmpty(Val))
+                if (String.IsNullOrEmpty(Val))
                 {
+                    Val = "";
+                };
 
                     if (result.ContainsKey(Val))
                     {
@@ -183,7 +185,7 @@ namespace WebApplication1TST
                         ItemID.Add(listItem.ID);
                         result.Add(Val, ItemID);
                     };
-                }
+                
 
             }
 
