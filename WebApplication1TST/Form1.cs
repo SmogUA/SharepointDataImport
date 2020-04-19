@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WebApplication1TST
@@ -31,14 +32,9 @@ namespace WebApplication1TST
                 var fileStream = openFileDialog1.OpenFile();
                 using (fileStream)
                 {
-                 List<string> sheets = new List<string>();
 
-                    using (var document = SpreadsheetDocument.Open(fileStream, false))
-                    {
-                        sheets = document.WorkbookPart.Workbook.Descendants<Sheet>().Select(sh => sh.Name.Value).ToList();
-                    }
                     SelectSpreadsheet.DataSource = blOpenXML.GetSheetsFromFile(fileStream);
-                    SelectSpreadsheet.Visible = true;
+                    SelectSpreadsheet.Visible = true;                    
                 }
                 selectWebs.DataSource = SP.GetAllWebs().Select(w => w.Url).ToList();
             }
@@ -88,8 +84,10 @@ namespace WebApplication1TST
             }
         }
 
-        private void StartImport_Click(object sender, EventArgs e)
+        private async void StartImport_Click(object sender, EventArgs e)
         {
+            DateTime starttime = DateTime.Now;
+            StartTime.Text = starttime.ToString("g");
             AddKey.Enabled = false;
             RemoveKey.Enabled = false;
             StartImport.Enabled = false;
@@ -97,34 +95,88 @@ namespace WebApplication1TST
 
             richTextBox1.Clear();
             Cursor = Cursors.WaitCursor;
-                       
-            var mapping = new List<DIMapping>();
+            Progress<int> progress = new Progress<int>(value => { progressBar1.Value = value; ProcessedItems.Text = value.ToString(); });
+            List<DIMapping> mapping = new List<DIMapping>();
+
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
                 var combocell = (DataGridViewComboBoxCell)row.Cells[1];
                 if (combocell.Value != null)
-                {              
-                string internalFieldName = combocell.Value.ToString();
-                var txtCell = (DataGridViewTextBoxCell)row.Cells[0];
-                var fileFieldName = txtCell.Value;
-                if (!string.IsNullOrEmpty(internalFieldName))
-                    mapping.Add(new DIMapping() { Name = internalFieldName, Value = fileFieldName.ToString() });
+                {
+                    string internalFieldName = combocell.Value.ToString();
+                    var txtCell = (DataGridViewTextBoxCell)row.Cells[0];
+                    var fileFieldName = txtCell.Value;
+                    if (!string.IsNullOrEmpty(internalFieldName))
+                        mapping.Add(new DIMapping() { Name = internalFieldName, Value = fileFieldName.ToString() });
                 }
             }
             if (mapping.Count == 0)
+            {
+
+                Cursor = Cursors.Arrow;
+                AddKey.Enabled = true;
+                RemoveKey.Enabled = true;
+                StartImport.Enabled = true;
+               
+                EndTime.Text = DateTime.Now.ToString("g");
                 return;
-
-            //GenarateHash
-            Dictionary<string, Hashtable> HashDictionary = null;
-            string TimeFormat = DateFormat.Text;
+            }
             List<string> SelectedKeys = new List<string>();
-            Dictionary<string, int> SelectedKeysRows = new Dictionary<string, int>();
-            Dictionary<string, SPList> LookupRelations = new Dictionary<string, SPList>();
-
             if (ActiveKeys.Items.Count > 0)
             {
                 SelectedKeys = ActiveKeys.Items.Cast<String>().ToList();
-                HashDictionary = GenerateHashTable.HashTableForListField(list, SelectedKeys, mapping, web, TimeFormat, ref LookupRelations);
+            }
+            string TabName = SelectSpreadsheet.SelectedItem.ToString();
+            int ItemsToImport = CountItemsToImport();
+            progressBar1.Maximum = ItemsToImport;
+            Task<string> result = Task.Run(() => RunTask(progress, web.Url, list.Title, mapping, TabName, SelectedKeys, DateFormat.Text));
+
+            richTextBox1.Text = await result;
+            EndTime.Text = DateTime.Now.ToString("g");
+            Cursor = Cursors.Arrow;
+            AddKey.Enabled = true;
+            RemoveKey.Enabled = true;
+            StartImport.Enabled = true;
+        }
+
+        private int CountItemsToImport()
+        {
+            System.IO.Stream fileStream = openFileDialog1.OpenFile();
+            int rez = 0;
+            if (!string.IsNullOrEmpty(SelectSpreadsheet.SelectedItem.ToString()))
+            {
+                using (SpreadsheetDocument document = SpreadsheetDocument.Open(fileStream, false))
+                {
+                    Sheet theSheet = document.WorkbookPart.Workbook.Descendants<Sheet>().Where(s => s.Name == SelectSpreadsheet.SelectedItem.ToString()).FirstOrDefault();
+                    var wsPart = (WorksheetPart)document.WorkbookPart.GetPartById(theSheet.Id);
+                    var sheetData = wsPart.Worksheet.GetFirstChild<SheetData>();
+                    if (sheetData.Elements<Row>().Count() > 0) rez = sheetData.Elements<Row>().Count() - 1 ;
+                }
+            }
+            return rez;
+        }
+
+        private async Task<string> RunTask(IProgress<int> progress,  string WebURL, string ListName, List<DIMapping> mapping, string TabName, List<string> SelectedKeys, string str_DateFormat)
+        {
+            string rez=String.Empty;
+            Dictionary<string, Hashtable> HashDictionary = null;
+            Dictionary<string, int> SelectedKeysRows = new Dictionary<string, int>();
+            Dictionary<string, SPList> LookupRelations = new Dictionary<string, SPList>();
+            SPList listloc = null;
+
+            SPSecurity.RunWithElevatedPrivileges(() =>
+            {
+
+             SharePoint SP = new SharePoint();
+             SPWeb Web = SP.GetWeb(WebURL);
+             listloc = SP.GetListByDisplayName(WebURL, ListName);
+
+            //GenarateHash    
+
+             if (SelectedKeys.Count > 0)
+            {
+               
+                HashDictionary = GenerateHashTable.HashTableForListField(listloc, SelectedKeys, mapping, web, str_DateFormat, ref LookupRelations);
 
                 for (var i = 0; i < SelectedKeys.Count; i++)
                 {
@@ -135,34 +187,25 @@ namespace WebApplication1TST
                     }
 
                 }
-
-
             }
-            else {
-                HashDictionary = GenerateHashTable.HashTableForListField(list, SelectedKeys, mapping, web, TimeFormat, ref LookupRelations);
+            else
+            {
+                HashDictionary = GenerateHashTable.HashTableForListField(listloc, SelectedKeys, mapping, web, str_DateFormat, ref LookupRelations);
             }
-             //Hash is ready
+                //Hash is ready
+            });
 
-            var fileStream = openFileDialog1.OpenFile();
+            System.IO.Stream fileStream = openFileDialog1.OpenFile();
             using (fileStream)
             {
-                var dataTable = blOpenXML.ImportToDataTable(fileStream, SelectSpreadsheet.SelectedItem.ToString(), DateFormat.Text, false);
+                var dataTable = blOpenXML.ImportToDataTable(fileStream, TabName, DateFormat.Text, false);
                 DateTime starttime = DateTime.Now;
-                DataImport.ProcessDataImport(list, mapping, dataTable, DateFormat.Text, web, LookupRelations, TimeFormat, HashDictionary, SelectedKeysRows);
-                richTextBox1.Text = DataImport.GetErrors();
-               
+                DataImport.ProcessDataImport(progress, listloc, mapping, dataTable, str_DateFormat, web, LookupRelations, str_DateFormat, HashDictionary, SelectedKeysRows);
+                rez = DataImport.GetErrors();
 
-                StartTime.Text = starttime.ToString("g");
-                EndTime.Text = DateTime.Now.ToString("g");
-                //long diff = DateAndTime.DateDiff(DateInterval.Minute, starttime, DateTime.Now);
-                ProcessedItems.Text = DataImport.GetNumberOfItems().ToString();
-                //TimeTaken.Text = Conversions.ToString(diff);
-            }
+            }            
 
-            Cursor = Cursors.Arrow;
-            AddKey.Enabled = true;
-            RemoveKey.Enabled = true;
-            StartImport.Enabled = true;
+            return rez;
         }
 
         private void AddKey_Click(object sender, EventArgs e)
@@ -213,5 +256,6 @@ namespace WebApplication1TST
                 
             
         }
+
     }
 }

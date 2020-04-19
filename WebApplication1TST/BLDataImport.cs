@@ -286,7 +286,7 @@ namespace DataImport
             }
            }
         }
-        public void ProcessDataImport(SPList lst, List<DIMapping> mapping, DataTable dataTable, string dateFormat, SPWeb web, Dictionary<string, SPList> LookupRelations,string TimeFormat, Dictionary<string, Hashtable> HashDictionary =null, Dictionary<string, int> SelectedKeysRows =null )
+        public void ProcessDataImport(IProgress<int> progress, SPList lst, List<DIMapping> mapping, DataTable dataTable, string dateFormat, SPWeb web, Dictionary<string, SPList> LookupRelations,string TimeFormat, Dictionary<string, Hashtable> HashDictionary =null, Dictionary<string, int> SelectedKeysRows =null )
         {
             Errors.Clear();
             NumberOfItems = 0;
@@ -297,6 +297,7 @@ namespace DataImport
 
             for (int index = 1, loopTo = dataTable.Rows.Count - 1; index <= loopTo; index++)
             {
+                progress?.Report(index);
                 List<SPListItem> itm = new List<SPListItem>();
                 try
                 {

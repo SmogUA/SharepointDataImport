@@ -63,6 +63,8 @@ namespace WebApplication1TST
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
             this.RemoveKey = new System.Windows.Forms.Button();
             this.AddKey = new System.Windows.Forms.Button();
             this.ActiveKeys = new System.Windows.Forms.ListBox();
@@ -71,8 +73,6 @@ namespace WebApplication1TST
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.ValidateData = new System.Windows.Forms.Button();
             this.DateExample = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
-            this.label10 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -285,6 +285,24 @@ namespace WebApplication1TST
             this.panel1.Size = new System.Drawing.Size(386, 169);
             this.panel1.TabIndex = 19;
             // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(243, 4);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(63, 13);
+            this.label10.TabIndex = 5;
+            this.label10.Text = "Active Keys";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(14, 4);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(72, 13);
+            this.label9.TabIndex = 4;
+            this.label9.Text = "Possible Keys";
+            // 
             // RemoveKey
             // 
             this.RemoveKey.Location = new System.Drawing.Point(155, 84);
@@ -356,24 +374,6 @@ namespace WebApplication1TST
             this.DateExample.Size = new System.Drawing.Size(121, 13);
             this.DateExample.TabIndex = 23;
             this.DateExample.Text = "02/14/2019";
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(14, 4);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(72, 13);
-            this.label9.TabIndex = 4;
-            this.label9.Text = "Possible Keys";
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(243, 4);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(63, 13);
-            this.label10.TabIndex = 5;
-            this.label10.Text = "Active Keys";
             // 
             // Form1
             // 
