@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.SharePoint;
 using System.Collections;
 using System.Globalization;
+using System.Collections.Concurrent;
 
 namespace DataImport
 {
@@ -39,7 +40,7 @@ namespace DataImport
         {
             DateTime dt;
             DateTime.TryParseExact(val, format, CultureInfo.InvariantCulture,   DateTimeStyles.None, out dt);
-            if (dt.Year <= 1900 || dt.Year >= 2100)
+            if (dt.Year <= 1900 || dt.Year >= 2150)
                 return default(DateTime);
             return dt;
         }
@@ -97,7 +98,7 @@ namespace DataImport
                 }
             }
         }
-        private void HashDefineLookupValue(ref SPItem itm, string rowCell, DIMapping map, SPField fld, Dictionary<string, Hashtable> HashDictionary, Dictionary<string, SPList> LookupRelations, bool CreateMissingLookupValues)
+        private void HashDefineLookupValue(ref SPItem itm, string rowCell, DIMapping map, SPField fld, ConcurrentDictionary<string, Hashtable> HashDictionary, Dictionary<string, SPList> LookupRelations, bool CreateMissingLookupValues)
         {
             SPFieldLookup field = (SPFieldLookup)fld;
             var DestanationInternalName = field.LookupField;
@@ -140,6 +141,7 @@ namespace DataImport
                                 DestItemID.Add(Item.ID);
                                 table.Add(val.Trim(), DestItemID);
                                 result.Add(new SPFieldLookupValue(Item.ID, Item[DestanationInternalName].ToString()));
+                                 err += map.Value + ": " + val + " New Lookup value was created";
                             }
                             else err += map.Value + ": " + val + ErrNotFound;
                         }                        
@@ -188,7 +190,7 @@ namespace DataImport
         }
             
       
-        private void FillNonStandardFields(List<SPListItem> items, string rowCell, DIMapping map, Dictionary<string, Hashtable> HashDictionary, Dictionary<string, SPList> LookupRelations, string dateFormat, bool CreateMissingLookupValues)
+        private void FillNonStandardFields(List<SPListItem> items, string rowCell, DIMapping map, ConcurrentDictionary<string, Hashtable> HashDictionary, Dictionary<string, SPList> LookupRelations, string dateFormat, bool CreateMissingLookupValues)
         {
             foreach (var itm in items)
             {
@@ -318,7 +320,7 @@ namespace DataImport
             }
            }
         }
-        public void ProcessDataImport(bool CreateMissingLookupValues, IProgress<int> progress, SPList lst, List<DIMapping> mapping, DataTable dataTable, string dateFormat, SPWeb web, Dictionary<string, SPList> LookupRelations,string TimeFormat, Dictionary<string, Hashtable> HashDictionary =null, Dictionary<string, int> SelectedKeysRows =null )
+        public void ProcessDataImport(bool CreateMissingLookupValues, IProgress<int> progress, SPList lst, List<DIMapping> mapping, DataTable dataTable, string dateFormat, SPWeb web, Dictionary<string, SPList> LookupRelations,string TimeFormat, ConcurrentDictionary<string, Hashtable> HashDictionary =null, Dictionary<string, int> SelectedKeysRows =null )
         {
             Errors.Clear();
             NumberOfItems = 0;
@@ -340,12 +342,16 @@ namespace DataImport
                         List<SPListItem>  UpdateItem = FindItemToUpdate(HashDictionary, SelectedKeysRows, rowCell, lst);
                         if (UpdateItem == null)
                         {
-                            //no item found, ltesc created a new one
+                            //no item found, lets created a new one
                             SPListItem NewItemToCreate = lst.AddItem();
                             itm.Add(NewItemToCreate);
 
                         }
                         else {
+                           // if(UpdateItem.Count>1)
+                           // {
+                           //     UpdateItem = FindItemToUpdate(HashDictionary, SelectedKeysRows, rowCell, lst);
+                           // }
                             itm = itm.Concat(UpdateItem).ToList();
                         };
                     }
@@ -376,7 +382,7 @@ namespace DataImport
             }
         }
 
-        private List<SPListItem> FindItemToUpdate(Dictionary<string, Hashtable> HashDictionary, Dictionary<string, int> SelectedKeysRows, DataRow rowCell, SPList DestanationList)
+        private List<SPListItem> FindItemToUpdate(ConcurrentDictionary<string, Hashtable> HashDictionary, Dictionary<string, int> SelectedKeysRows, DataRow rowCell, SPList DestanationList)
         {
             List<int> result = null;
             List<SPListItem> ItemsToUpdate = null;
@@ -405,6 +411,10 @@ namespace DataImport
                     {
                         tmp = (List<int>)table[SearchValue];
                         result = result.Intersect(tmp).ToList();
+                    }
+                    else
+                    {
+                        result = null;
                     }
 
                 };

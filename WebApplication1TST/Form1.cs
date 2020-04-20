@@ -4,6 +4,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.SharePoint;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -93,6 +94,7 @@ namespace WebApplication1TST
             RemoveKey.Enabled = false;
             StartImport.Enabled = false;
             ValidateData.Enabled = false;
+            progressBar1.Value = 0;
             bool CreateMissingLookupValues = checkBox1.Checked;
 
             richTextBox1.Clear();
@@ -131,8 +133,13 @@ namespace WebApplication1TST
             string TabName = SelectSpreadsheet.SelectedItem.ToString();
             int ItemsToImport = CountItemsToImport();
             progressBar1.Maximum = ItemsToImport;
+            richTextBox1.Clear();
+            richTextBox1.AppendText("Hash tables generation started. Please keep calm, it will take some time, depends on items number in the related lookup lists");
             Task<string> result = Task.Run(() => RunTask(progress, web.Url, list.Title, mapping, TabName, SelectedKeys, DateFormat.Text, CreateMissingLookupValues));
-            richTextBox1.Text = await result;
+
+            string textRes = await result;
+            if (!string.IsNullOrEmpty(textRes)) { richTextBox1.AppendText("\r\n"); richTextBox1.AppendText(textRes); }
+            richTextBox1.AppendText("\r\nProcess import process has been completed");
             EndTime.Text = DateTime.Now.ToString("g");
             Cursor = Cursors.Arrow;
             button1.Enabled = true;
@@ -161,7 +168,7 @@ namespace WebApplication1TST
         private async Task<string> RunTask(IProgress<int> progress,  string WebURL, string ListName, List<DIMapping> mapping, string TabName, List<string> SelectedKeys, string str_DateFormat, bool CreateMissingLookupValues)
         {
             string rez=String.Empty;
-            Dictionary<string, Hashtable> HashDictionary = null;
+            ConcurrentDictionary<string, Hashtable> HashDictionary = null;
             Dictionary<string, int> SelectedKeysRows = new Dictionary<string, int>();
             Dictionary<string, SPList> LookupRelations = new Dictionary<string, SPList>();
             SPList listloc = null;
@@ -172,13 +179,15 @@ namespace WebApplication1TST
              SharePoint SP = new SharePoint();
              SPWeb Web = SP.GetWeb(WebURL);
              listloc = SP.GetListByDisplayName(WebURL, ListName);
+            //Generate lookuprelations
+             LookupRelations = GenerateLookupRelations(mapping, Web, listloc);
 
             //GenarateHash    
 
-             if (SelectedKeys.Count > 0)
+                if (SelectedKeys.Count > 0)
             {
                
-                HashDictionary = GenerateHashTable.HashTableForListField(listloc, SelectedKeys, mapping, web, str_DateFormat, ref LookupRelations);
+                HashDictionary = GenerateHashTable.HashTableForListField(listloc, SelectedKeys, mapping, web.Url, str_DateFormat);
 
                 for (var i = 0; i < SelectedKeys.Count; i++)
                 {
@@ -192,10 +201,12 @@ namespace WebApplication1TST
             }
             else
             {
-                HashDictionary = GenerateHashTable.HashTableForListField(listloc, SelectedKeys, mapping, web, str_DateFormat, ref LookupRelations);
+                HashDictionary = GenerateHashTable.HashTableForListField(listloc, SelectedKeys, mapping, web.Url, str_DateFormat);
             }
                 
             });
+
+            richTextBox1.Invoke(new Action(() => { richTextBox1.AppendText("\r\nHash tables are ready. Starting the items data import."); }));            
             //Hash is ready
 
             System.IO.Stream fileStream = openFileDialog1.OpenFile();
@@ -209,6 +220,33 @@ namespace WebApplication1TST
             }            
 
             return rez;
+        }
+
+        private Dictionary<string, SPList> GenerateLookupRelations(List<DIMapping> mapping, SPWeb Web, SPList list)
+        {
+            Dictionary<string, SPList> LookupRelations = new Dictionary<string, SPList>();
+
+            foreach (DIMapping mp in mapping)
+            {
+                SPField field = list.Fields.GetField(mp.Name);
+                SPFieldType fieldType = field.Type;
+
+                if (fieldType == SPFieldType.Lookup)
+                {
+                    SPList LookupList = null;
+                    SPFieldLookup lookupField = (SPFieldLookup)list.Fields.GetField(mp.Name);
+
+                    if (!String.IsNullOrEmpty(lookupField.LookupList) && !String.IsNullOrEmpty(lookupField.LookupField))
+                    {
+
+                        // Get the name of the list where this field gets information.
+                        LookupList = Web.Lists[new Guid(lookupField.LookupList)];
+                        LookupRelations.Add(mp.Value, LookupList);
+
+                    }
+                }
+            }
+            return LookupRelations;
         }
 
         private void AddKey_Click(object sender, EventArgs e)
