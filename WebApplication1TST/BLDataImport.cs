@@ -97,9 +97,10 @@ namespace DataImport
                 }
             }
         }
-        private void HashDefineLookupValue(ref SPItem itm, string rowCell, DIMapping map, SPField fld, Dictionary<string, Hashtable> HashDictionary, Dictionary<string, SPList> LookupRelations)
+        private void HashDefineLookupValue(ref SPItem itm, string rowCell, DIMapping map, SPField fld, Dictionary<string, Hashtable> HashDictionary, Dictionary<string, SPList> LookupRelations, bool CreateMissingLookupValues)
         {
-            var field = (SPFieldLookup)fld;
+            SPFieldLookup field = (SPFieldLookup)fld;
+            var DestanationInternalName = field.LookupField;
             SPList list = LookupRelations[map.Value];
             string Lookuplistname = list.Title + "LIST";
             Hashtable table = HashDictionary[Lookuplistname];
@@ -108,21 +109,40 @@ namespace DataImport
             if (field.AllowMultipleValues)
             {
 
-                var values = rowCell.ToLower().Split(multivalueDelimiter.ToArray(), StringSplitOptions.RemoveEmptyEntries);
+                var values = rowCell.Split(multivalueDelimiter.ToArray(), StringSplitOptions.RemoveEmptyEntries);
                 var result = new SPFieldLookupValueCollection();
-                foreach (string val in values)
+                foreach (string ValOrig in values)
                 {
+                    string val = ValOrig.ToLower();
                     bool isExists = false;
 
                     List<int> ItemID = (List<int>)table[val];
-                    SPListItem Item = list.GetItemById(ItemID.FirstOrDefault());
-                    result.Add(new SPFieldLookupValue(Item.ID, Item[field.LookupField].ToString()));
-                    isExists = true;
+                    if (ItemID != null)
+                    {
+                        if (ItemID.Count>0)
+                        {
+                            SPListItem Item = list.GetItemById(ItemID.FirstOrDefault());                        
+                            result.Add(new SPFieldLookupValue(Item.ID, Item[field.LookupField].ToString()));
+                            isExists = true;
+                        }
+                    }
 
-                    if (!isExists)
+                   if (!isExists)
                     {
                         if (!string.IsNullOrEmpty(val))
-                            err += val + ": " + val + ErrNotFound;
+                        {
+                            if (CreateMissingLookupValues)
+                            {
+                                SPListItem Item = list.AddItem();
+                                Item[DestanationInternalName] = ValOrig.Trim();
+                                Item.Update();
+                                List<int> DestItemID = new List<int>();
+                                DestItemID.Add(Item.ID);
+                                table.Add(val.Trim(), DestItemID);
+                                result.Add(new SPFieldLookupValue(Item.ID, Item[DestanationInternalName].ToString()));
+                            }
+                            else err += map.Value + ": " + val + ErrNotFound;
+                        }                        
                         else
                             err += val + ErrNotFound;
                     }
@@ -144,7 +164,19 @@ namespace DataImport
                 if (val == null)
                 {
                     if (!string.IsNullOrEmpty(rowCell))
-                        err += map.Value + ": " + rowCell + ErrNotFound;
+                        if (CreateMissingLookupValues)
+                        {
+                           SPListItem Item = list.AddItem();
+                           Item[DestanationInternalName] = rowCell.Trim();
+                           Item.Update();
+                           List<int> DestItemID = new List<int>();
+                           DestItemID.Add(Item.ID);
+                           table.Add(rowCell.ToLower().Trim(), DestItemID);
+                           val = new SPFieldLookupValue(Item.ID, Item[DestanationInternalName].ToString());
+                           itm[map.Name] = val;
+                           err += map.Value + ": " + rowCell + " New Lookup value was created!";
+                        }
+                        else err += map.Value + ": " + rowCell + ErrNotFound;
                     else
                         err += map.Value + ErrNotFound;
                 }
@@ -156,7 +188,7 @@ namespace DataImport
         }
             
       
-        private void FillNonStandardFields(List<SPListItem> items, string rowCell, DIMapping map, Dictionary<string, Hashtable> HashDictionary, Dictionary<string, SPList> LookupRelations, string dateFormat)
+        private void FillNonStandardFields(List<SPListItem> items, string rowCell, DIMapping map, Dictionary<string, Hashtable> HashDictionary, Dictionary<string, SPList> LookupRelations, string dateFormat, bool CreateMissingLookupValues)
         {
             foreach (var itm in items)
             {
@@ -215,7 +247,7 @@ namespace DataImport
                         case SPFieldType.Lookup:
                             {
                                 SPItem argitm = itm;
-                                HashDefineLookupValue(ref argitm, rowCell, map, fld, HashDictionary, LookupRelations);
+                                HashDefineLookupValue(ref argitm, rowCell, map, fld, HashDictionary, LookupRelations, CreateMissingLookupValues);
                                 break;
                             }
 
@@ -252,7 +284,7 @@ namespace DataImport
                                 if (fld.FieldValueType == typeof(SPFieldLookupValue) | fld.FieldValueType == typeof(SPFieldLookupValueCollection))
                                 {
                                     SPItem argitm1 = itm;
-                                        HashDefineLookupValue(ref argitm1, rowCell, map, fld, HashDictionary, LookupRelations);
+                                        HashDefineLookupValue(ref argitm1, rowCell, map, fld, HashDictionary, LookupRelations,CreateMissingLookupValues);
                                    // DefineLookupValue(ref argitm1, rowCell, map, fld);
                                 }
 
@@ -286,7 +318,7 @@ namespace DataImport
             }
            }
         }
-        public void ProcessDataImport(IProgress<int> progress, SPList lst, List<DIMapping> mapping, DataTable dataTable, string dateFormat, SPWeb web, Dictionary<string, SPList> LookupRelations,string TimeFormat, Dictionary<string, Hashtable> HashDictionary =null, Dictionary<string, int> SelectedKeysRows =null )
+        public void ProcessDataImport(bool CreateMissingLookupValues, IProgress<int> progress, SPList lst, List<DIMapping> mapping, DataTable dataTable, string dateFormat, SPWeb web, Dictionary<string, SPList> LookupRelations,string TimeFormat, Dictionary<string, Hashtable> HashDictionary =null, Dictionary<string, int> SelectedKeysRows =null )
         {
             Errors.Clear();
             NumberOfItems = 0;
@@ -330,7 +362,7 @@ namespace DataImport
                         var map = mapping.Where(m => (m.Value ?? "") == (colNameByIndex ?? "")).FirstOrDefault();
 
                         if (map != null)
-                            FillNonStandardFields(itm, rowCell, map, HashDictionary, LookupRelations, dateFormat);
+                            FillNonStandardFields(itm, rowCell, map, HashDictionary, LookupRelations, dateFormat, CreateMissingLookupValues);
                     }
                 }
                 catch (Exception ex)

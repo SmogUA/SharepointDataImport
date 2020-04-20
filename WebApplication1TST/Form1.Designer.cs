@@ -130,9 +130,9 @@ namespace WebApplication1TST
             // SelectSpreadsheet
             // 
             this.SelectSpreadsheet.FormattingEnabled = true;
-            this.SelectSpreadsheet.Location = new System.Drawing.Point(199, 65);
+            this.SelectSpreadsheet.Location = new System.Drawing.Point(133, 65);
             this.SelectSpreadsheet.Name = "SelectSpreadsheet";
-            this.SelectSpreadsheet.Size = new System.Drawing.Size(121, 21);
+            this.SelectSpreadsheet.Size = new System.Drawing.Size(244, 21);
             this.SelectSpreadsheet.TabIndex = 5;
             this.SelectSpreadsheet.SelectedValueChanged += new System.EventHandler(this.SelectSpreadsheet_SelectedIndexChanged);
             // 
@@ -166,24 +166,24 @@ namespace WebApplication1TST
             // SelecList
             // 
             this.SelecList.FormattingEnabled = true;
-            this.SelecList.Location = new System.Drawing.Point(199, 117);
+            this.SelecList.Location = new System.Drawing.Point(133, 117);
             this.SelecList.Name = "SelecList";
-            this.SelecList.Size = new System.Drawing.Size(121, 21);
+            this.SelecList.Size = new System.Drawing.Size(244, 21);
             this.SelecList.TabIndex = 7;
             this.SelecList.SelectedValueChanged += new System.EventHandler(this.SelecList_SelectedIndexChanged);
             // 
             // selectWebs
             // 
             this.selectWebs.FormattingEnabled = true;
-            this.selectWebs.Location = new System.Drawing.Point(199, 90);
+            this.selectWebs.Location = new System.Drawing.Point(133, 90);
             this.selectWebs.Name = "selectWebs";
-            this.selectWebs.Size = new System.Drawing.Size(121, 21);
+            this.selectWebs.Size = new System.Drawing.Size(244, 21);
             this.selectWebs.TabIndex = 8;
             this.selectWebs.SelectedValueChanged += new System.EventHandler(this.SelectWebs_SelectedIndexChanged);
             // 
             // DateFormat
             // 
-            this.DateFormat.Location = new System.Drawing.Point(199, 144);
+            this.DateFormat.Location = new System.Drawing.Point(133, 144);
             this.DateFormat.Name = "DateFormat";
             this.DateFormat.Size = new System.Drawing.Size(121, 20);
             this.DateFormat.TabIndex = 9;
@@ -349,7 +349,6 @@ namespace WebApplication1TST
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Enabled = false;
             this.checkBox1.Location = new System.Drawing.Point(554, 404);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(163, 17);
@@ -369,7 +368,7 @@ namespace WebApplication1TST
             // 
             // DateExample
             // 
-            this.DateExample.Location = new System.Drawing.Point(199, 167);
+            this.DateExample.Location = new System.Drawing.Point(133, 168);
             this.DateExample.Name = "DateExample";
             this.DateExample.Size = new System.Drawing.Size(121, 13);
             this.DateExample.TabIndex = 23;

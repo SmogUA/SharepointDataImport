@@ -30,11 +30,10 @@ namespace WebApplication1TST
             }
             //CreatefingLookup fields HashTables
 
-                foreach (DIMapping mp in mapping)
-                {                    
-                   
-                SPField field = list.Fields.GetField(mp.Name);
-                SPFieldType fieldType = field.Type;
+            foreach (DIMapping mp in mapping)
+            {    
+             SPField field = list.Fields.GetField(mp.Name);
+             SPFieldType fieldType = field.Type;
 
                 if (fieldType == SPFieldType.Lookup)
                 {
@@ -53,7 +52,6 @@ namespace WebApplication1TST
                             SPField primaryField = list.Fields[new Guid(lookupField.PrimaryFieldId)];
                           
                         }
-
                         // Get the site where the target list is located.
 
                         // Get the name of the list where this field gets information.
@@ -61,20 +59,15 @@ namespace WebApplication1TST
                         SPField targetField = LookupList.Fields.GetFieldByInternalName(lookupField.LookupField);
                         string TargetInternalName = targetField.InternalName;
                         string Lookuplistname = LookupList.Title + "LIST";
-                        Hashtable HT = GetLookupHash(LookupList, TargetInternalName);
-                        HashDictionary.Add(Lookuplistname, HT);
 
-                        LookupRelations.Add(mp.Value, LookupList);
-
-                    }
-
-
-                 
-
-
+                        if (!HashDictionary.ContainsKey(Lookuplistname))
+                        {
+                            Hashtable HT = GetLookupHash(LookupList, TargetInternalName);
+                            HashDictionary.Add(Lookuplistname, HT);
+                            LookupRelations.Add(mp.Value, LookupList);
+                        }
+                    }             
                 };
-
-
             }
 
 
@@ -137,10 +130,6 @@ namespace WebApplication1TST
 
                     }
 
-
-
-
-
                     if (Val != null && table.ContainsKey(Val))
                     {
                        List<int> tmp = (List<int>)table[Val];
@@ -157,7 +146,6 @@ namespace WebApplication1TST
                 }
 
             }
-
             return HashDictionary;
         }
 

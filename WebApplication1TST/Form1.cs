@@ -88,10 +88,12 @@ namespace WebApplication1TST
         {
             DateTime starttime = DateTime.Now;
             StartTime.Text = starttime.ToString("g");
+            button1.Enabled = false;
             AddKey.Enabled = false;
             RemoveKey.Enabled = false;
             StartImport.Enabled = false;
             ValidateData.Enabled = false;
+            bool CreateMissingLookupValues = checkBox1.Checked;
 
             richTextBox1.Clear();
             Cursor = Cursors.WaitCursor;
@@ -114,10 +116,10 @@ namespace WebApplication1TST
             {
 
                 Cursor = Cursors.Arrow;
+                button1.Enabled = true;
                 AddKey.Enabled = true;
                 RemoveKey.Enabled = true;
-                StartImport.Enabled = true;
-               
+                StartImport.Enabled = true;               
                 EndTime.Text = DateTime.Now.ToString("g");
                 return;
             }
@@ -129,11 +131,11 @@ namespace WebApplication1TST
             string TabName = SelectSpreadsheet.SelectedItem.ToString();
             int ItemsToImport = CountItemsToImport();
             progressBar1.Maximum = ItemsToImport;
-            Task<string> result = Task.Run(() => RunTask(progress, web.Url, list.Title, mapping, TabName, SelectedKeys, DateFormat.Text));
-
+            Task<string> result = Task.Run(() => RunTask(progress, web.Url, list.Title, mapping, TabName, SelectedKeys, DateFormat.Text, CreateMissingLookupValues));
             richTextBox1.Text = await result;
             EndTime.Text = DateTime.Now.ToString("g");
             Cursor = Cursors.Arrow;
+            button1.Enabled = true;
             AddKey.Enabled = true;
             RemoveKey.Enabled = true;
             StartImport.Enabled = true;
@@ -156,7 +158,7 @@ namespace WebApplication1TST
             return rez;
         }
 
-        private async Task<string> RunTask(IProgress<int> progress,  string WebURL, string ListName, List<DIMapping> mapping, string TabName, List<string> SelectedKeys, string str_DateFormat)
+        private async Task<string> RunTask(IProgress<int> progress,  string WebURL, string ListName, List<DIMapping> mapping, string TabName, List<string> SelectedKeys, string str_DateFormat, bool CreateMissingLookupValues)
         {
             string rez=String.Empty;
             Dictionary<string, Hashtable> HashDictionary = null;
@@ -192,15 +194,16 @@ namespace WebApplication1TST
             {
                 HashDictionary = GenerateHashTable.HashTableForListField(listloc, SelectedKeys, mapping, web, str_DateFormat, ref LookupRelations);
             }
-                //Hash is ready
+                
             });
+            //Hash is ready
 
             System.IO.Stream fileStream = openFileDialog1.OpenFile();
             using (fileStream)
             {
                 var dataTable = blOpenXML.ImportToDataTable(fileStream, TabName, DateFormat.Text, false);
                 DateTime starttime = DateTime.Now;
-                DataImport.ProcessDataImport(progress, listloc, mapping, dataTable, str_DateFormat, web, LookupRelations, str_DateFormat, HashDictionary, SelectedKeysRows);
+                DataImport.ProcessDataImport(CreateMissingLookupValues, progress, listloc, mapping, dataTable, str_DateFormat, web, LookupRelations, str_DateFormat, HashDictionary, SelectedKeysRows);
                 rez = DataImport.GetErrors();
 
             }            
