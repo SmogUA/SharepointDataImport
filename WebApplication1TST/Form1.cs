@@ -139,7 +139,7 @@ namespace WebApplication1TST
 
             string textRes = await result;
             if (!string.IsNullOrEmpty(textRes)) { richTextBox1.AppendText("\r\n"); richTextBox1.AppendText(textRes); }
-            richTextBox1.AppendText("\r\nProcess import process has been completed");
+            richTextBox1.AppendText("\r\nData import process has been completed");
             EndTime.Text = DateTime.Now.ToString("g");
             Cursor = Cursors.Arrow;
             button1.Enabled = true;

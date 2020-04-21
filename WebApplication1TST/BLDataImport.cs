@@ -190,19 +190,34 @@ namespace DataImport
         }
             
       
-        private void FillNonStandardFields(List<SPListItem> items, string rowCell, DIMapping map, ConcurrentDictionary<string, Hashtable> HashDictionary, Dictionary<string, SPList> LookupRelations, string dateFormat, bool CreateMissingLookupValues)
+        private void FillNonStandardFields(List<SPListItem> items, string rowCell, DIMapping map, ConcurrentDictionary<string, Hashtable> HashDictionary, Dictionary<string, SPList> LookupRelations, string dateFormat, bool CreateMissingLookupValues, SPWeb Web)
         {
             foreach (var itm in items)
             {
-                
-           
-            var fld = nonStandardListFields.Where(sf => (sf.InternalName ?? "") == (map.Name ?? "")).FirstOrDefault();
+
+
+            SPField fld = nonStandardListFields.Where(sf => (sf.InternalName ?? "") == (map.Name ?? "")).FirstOrDefault();
             if (fld != null)
             {
                 if (!string.IsNullOrEmpty(rowCell))
                 {
                     switch (fld.Type)
                     {
+                        case SPFieldType.User:
+                                {
+                                    try
+                                    {
+                                        SPUser SpUserName = Web.EnsureUser(rowCell);
+                                        string EnsuredUserName = SpUserName.ID.ToString() + ";#" + SpUserName.LoginName.ToString();
+                                        itm[map.Name] = EnsuredUserName;                                        
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        err += map.Value + " Faild to ensure SP user: "+ rowCell;
+                                    }
+
+                                    break;
+                                }
                         case SPFieldType.Text:
                         case SPFieldType.Note:
                             {
@@ -368,7 +383,7 @@ namespace DataImport
                         var map = mapping.Where(m => (m.Value ?? "") == (colNameByIndex ?? "")).FirstOrDefault();
 
                         if (map != null)
-                            FillNonStandardFields(itm, rowCell, map, HashDictionary, LookupRelations, dateFormat, CreateMissingLookupValues);
+                            FillNonStandardFields(itm, rowCell, map, HashDictionary, LookupRelations, dateFormat, CreateMissingLookupValues, web);
                     }
                 }
                 catch (Exception ex)
