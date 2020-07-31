@@ -205,7 +205,15 @@ namespace WebApplication1TST
             var result = new Hashtable();
             foreach (SPListItem listItem in list.Items)
             {
-                string Val = listItem[TargetInternalName].ToString().ToLower();
+                string Val = string.Empty;
+
+                try
+                {
+                   Val = listItem[TargetInternalName].ToString().ToLower();
+                }
+                catch
+                {
+                };
 
                 if (String.IsNullOrEmpty(Val))
                 {
