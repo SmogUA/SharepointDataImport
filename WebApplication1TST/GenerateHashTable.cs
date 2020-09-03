@@ -135,9 +135,15 @@ namespace WebApplication1TST
                         case SPFieldType.Lookup:
                             if (listItem[mp.Name] != null)
                             {
+                                try{
                                 Val = listItem[mp.Name].ToString();
                                 SPFieldLookupValue value = new SPFieldLookupValue(Val);
                                 Val = value.LookupValue.ToLower();
+                                    }
+                                catch
+                                {
+                                    Val = null;
+                                }
                             }
                             break;
                         case SPFieldType.Text:
